@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1142dac5-84b8-48f5-ac02-91d5dbbd2e16" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="b2268a54-1980-45b1-9212-f8ae0e2c98b5" >
+		<jms:active-mq-connection username="admin" password="admin" >
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<flow name="ack-in-jms-activemqFlow" doc:id="c7d02e88-8140-4c40-9d45-5bc452c326f3" >
+		<http:listener doc:name="Listener" doc:id="16b054fc-70da-4977-b129-6bd5a8f78365" config-ref="HTTP_Listener_config" path="ack"/>
+		<jms:consume doc:name="Consume" doc:id="d1e78b4a-fe54-4061-9401-8ef73aba6801" config-ref="JMS_Config" destination="jms1" ackMode="MANUAL"/>
+		<logger level="INFO" doc:name="Logger" doc:id="87341722-e955-4f2d-b781-7c4d82bc8e4b" message='#["ack process"]'/>
+		<jms:ack doc:name="Ack" doc:id="ec325d98-a3f1-46aa-930a-375846f0e3f1" ackId="#[attributes.ackId]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3c4fa352-305e-42fa-817a-170b30ed70b0" message='#["ack process done"]'/>
+	</flow>
+</mule>
